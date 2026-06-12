@@ -21,7 +21,7 @@ const startServer = async () => {
                 console.log('MongoDB connection closed.');
                 process.exit(0);
             });
-        };
+        });
     });
 };
 
