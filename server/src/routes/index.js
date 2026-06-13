@@ -5,4 +5,4 @@ const authRoutes = require('./authRoutes');
 router.use('/auth', authRoutes);
 //Future routes can be added here
 
-module.exports = router;
+module.exports = { routes: router };

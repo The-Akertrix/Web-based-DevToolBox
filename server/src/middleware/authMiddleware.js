@@ -16,7 +16,7 @@ const protect = async(req, res, next) => {
     }
     
     // jwt.verify throws 
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Attach user to request (without password)
     req.user = await User.findById(decoded.id);
@@ -34,7 +34,7 @@ const protect = async(req, res, next) => {
 const authorize = (...roles) => {
     return (req, res, next) => {
         if(!roles.includes(req.user.role)) {
-            const error = new Error("Role ${req.user.role} is not authorized to perform this action");
+            const error = new Error(`Role ${req.user.role} is not authorized to perform this action`);
             error.statusCode = 403;
             return next(error);
         }
