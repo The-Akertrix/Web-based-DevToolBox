@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import ToolLayout from '../../components/tools/ToolLayout';
 import { useDebounce } from '../../hooks/useDebounce';
 import { safeRegexTest, buildHighlightSegments } from '../../utils/regexEngine';
@@ -19,12 +19,25 @@ const RegexTesterPage = () => {
   const debouncedPattern = useDebounce(pattern, 300);
   const debouncedTestString = useDebounce(testString, 300);
 
-  // useMemo: recomputes only when debounced values change
-  const { error, matches, isTimeout } = useMemo(() => {
+  const [result, setResult] = useState({ error: null, matches: [], isTimeout: false });
+  const { error, matches, isTimeout } = result;
+
+  useEffect(() => {
     if (!debouncedPattern || !debouncedTestString) {
-      return { error: null, matches: [], isTimeout: false };
+      setResult({ error: null, matches: [], isTimeout: false });
+      return;
     }
-    return safeRegexTest(debouncedPattern, flags, debouncedTestString);
+
+    let active = true;
+    safeRegexTest(debouncedPattern, flags, debouncedTestString).then((res) => {
+      if (active) {
+        setResult(res);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
   }, [debouncedPattern, flags, debouncedTestString]);
 
   const segments = useMemo(() => {

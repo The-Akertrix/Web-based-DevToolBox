@@ -37,7 +37,7 @@ const proxyRequest = async(req, res) => {
             url,
             method : upperMethod,
             headers : safeHeaders,
-            data : ['GET', 'HEAD'].includes(upperMethod) ? undefind : body,
+            data : ['GET', 'HEAD'].includes(upperMethod) ? undefined : body,
             timeout,
             maxContentLength : MAX_RESPONSE_SIZE_BYTES,
             validateStatus : () => true,  // Don't throw on 4xx/5xx - return them to user
@@ -64,7 +64,7 @@ const proxyRequest = async(req, res) => {
             headers : response.headers,
             data : responseData,
             duration,
-            size : Buffer.byteLength(JSON.stringify(response.data), 'utf8'),
+            size : Buffer.byteLength(JSON.stringify(responseData), 'utf8'),
         });
     }
     catch(axiosError){

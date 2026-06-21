@@ -1,8 +1,25 @@
 const jwt = require('jsonwebtoken');
+const ApiCollection = require('../models/ApiCollection');
 
 // @route   POST /api/tools/jwt/verify
 // @desc    Verify a JWT using a provided secret
 // @access  Private
+
+const getCollections = async (req, res) => {
+    const collections = await ApiCollection.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.json({ success: true, data: collections });
+};
+
+const createCollection = async (req, res) => {
+    const { name, requests } = req.body;
+    const collection = await ApiCollection.create({
+        user: req.user._id,
+        name,
+        requests
+    });
+    res.status(201).json({ success: true, data: collection });
+};
+
 
 const verifyJWT = async (req, res) => { 
     const { token, secret, algorithm }  = req.body;
@@ -14,14 +31,14 @@ const verifyJWT = async (req, res) => {
     }
 
     try {
-        const decode = jwt.verify(token, secret, {
+        const decoded = jwt.verify(token, secret, {
             algorithms : [algorithm || 'HS256'],
         });
 
-        res.join({
+        res.json({
             success : true,
             valid : true, 
-            decode, 
+            decoded, 
             message : 'Token signature is valid.',
         });
     }
@@ -37,4 +54,4 @@ const verifyJWT = async (req, res) => {
     }
 };
 
-module.exports = { verifyJWT };
+module.exports = { verifyJWT, getCollections, createCollection };

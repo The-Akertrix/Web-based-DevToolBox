@@ -3,58 +3,79 @@
  * Uses a Web Worker pattern concept — for simplicity we use a sync timeout flag.
  */
 export const safeRegexTest = (pattern, flags, testString, timeoutMs = 2000) => {
-  let regex;
-  try {
-    regex = new RegExp(pattern, flags);
-  } catch (e) {
-    return { error: `Invalid regex: ${e.message}`, matches: [], isTimeout: false };
-  }
-
-  // Reset lastIndex for global regexes to avoid stale state
-  regex.lastIndex = 0;
-
-  const matches = [];
-  const startTime = performance.now();
-
-  if (flags.includes('g')) {
-    let match;
-    while ((match = regex.exec(testString)) !== null) {
-      // Timeout check inside the loop
-      if (performance.now() - startTime > timeoutMs) {
-        return {
-          error: `⚠️ Execution timed out after ${timeoutMs}ms. This pattern may be vulnerable to ReDoS.`,
-          matches,
-          isTimeout: true,
-        };
-      }
-
-      matches.push({
-        value: match[0],
-        index: match.index,
-        end: match.index + match[0].length,
-        groups: match.slice(1), // Capture groups
-        namedGroups: match.groups || {},
-      });
-
-      // Prevent infinite loop on zero-length matches
-      if (match[0].length === 0) {
-        regex.lastIndex++;
-      }
+  return new Promise((resolve) => {
+    try {
+      new RegExp(pattern, flags);
+    } catch (e) {
+      return resolve({ error: `Invalid regex: ${e.message}`, matches: [], isTimeout: false });
     }
-  } else {
-    const match = regex.exec(testString);
-    if (match) {
-      matches.push({
-        value: match[0],
-        index: match.index,
-        end: match.index + match[0].length,
-        groups: match.slice(1),
-        namedGroups: match.groups || {},
-      });
-    }
-  }
 
-  return { error: null, matches, isTimeout: false };
+    const workerCode = `
+      self.onmessage = function(e) {
+        const { pattern, flags, testString } = e.data;
+        try {
+          const regex = new RegExp(pattern, flags);
+          regex.lastIndex = 0;
+          const matches = [];
+          if (flags.includes('g')) {
+            let match;
+            while ((match = regex.exec(testString)) !== null) {
+              matches.push({
+                value: match[0],
+                index: match.index,
+                end: match.index + match[0].length,
+                groups: match.slice(1),
+                namedGroups: match.groups || {},
+              });
+              if (match[0].length === 0) {
+                regex.lastIndex++;
+              }
+            }
+          } else {
+            const match = regex.exec(testString);
+            if (match) {
+              matches.push({
+                value: match[0],
+                index: match.index,
+                end: match.index + match[0].length,
+                groups: match.slice(1),
+                namedGroups: match.groups || {},
+              });
+            }
+          }
+          self.postMessage({ error: null, matches, isTimeout: false });
+        } catch (err) {
+          self.postMessage({ error: err.message, matches: [], isTimeout: false });
+        }
+      };
+    `;
+
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const worker = new Worker(URL.createObjectURL(blob));
+
+    const timeoutId = setTimeout(() => {
+      worker.terminate();
+      resolve({
+        error: `⚠️ Execution timed out after ${timeoutMs}ms. This pattern may be vulnerable to ReDoS.`,
+        matches: [],
+        isTimeout: true,
+      });
+    }, timeoutMs);
+
+    worker.onmessage = (e) => {
+      clearTimeout(timeoutId);
+      worker.terminate();
+      resolve(e.data);
+    };
+
+    worker.onerror = (err) => {
+      clearTimeout(timeoutId);
+      worker.terminate();
+      resolve({ error: err.message, matches: [], isTimeout: false });
+    };
+
+    worker.postMessage({ pattern, flags, testString });
+  });
 };
 
 /**

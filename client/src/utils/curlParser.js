@@ -46,6 +46,17 @@ const tokenize = (curlString) => {
   return tokens;
 };
 
+const isUrlLike = (str) => {
+  if (str.startsWith('http') || str.startsWith('//')) return true;
+  if (str.startsWith('-')) return false;
+  // Exclude timeout/numeric values
+  if (/^[+-]?\d+(\.\d+)?$/.test(str)) return false;
+  // If it has a dot or a slash, and looks like a hostname/path
+  if (str.includes('.') || str.includes('/')) return true;
+  if (str === 'localhost') return true;
+  return false;
+};
+
 const parseCurl = (curlString) => {
   const tokens = tokenize(curlString);
 
@@ -62,9 +73,13 @@ const parseCurl = (curlString) => {
   while (i < tokens.length) {
     const token = tokens[i];
 
-    // URL: first token that starts with http
-    if (token.startsWith('http') || token.startsWith('//')) {
-      result.url = token;
+    // URL: check if the token looks like a URL/host
+    if (isUrlLike(token)) {
+      let urlVal = token;
+      if (!urlVal.startsWith('http:') && !urlVal.startsWith('https:') && !urlVal.startsWith('//')) {
+        urlVal = urlVal.startsWith('localhost') ? `http://${urlVal}` : `https://${urlVal}`;
+      }
+      result.url = urlVal;
       i++;
       continue;
     }

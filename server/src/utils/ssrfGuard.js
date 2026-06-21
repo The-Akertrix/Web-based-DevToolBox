@@ -24,7 +24,7 @@ const isPrivateIP = (ip) => {
     return BLOCKED_CIDRS.some(pattern => pattern.test(ip));
 }
 
-export const validateProxyTarget = async (url) => {
+const validateProxyTarget = async (url) => {
     let parsed;
     try {
         parsed = new URL(url);
@@ -55,8 +55,8 @@ export const validateProxyTarget = async (url) => {
 
     //DNS resolve and check resulting IP
     try{
-        const address = await dns.lookup(hostname, { all : true });
-        for(const { address } of address) {
+        const addresses = await dns.lookup(hostname, { all : true });
+        for(const { address } of addresses) {
             if(isPrivateIP(address)) {
                 throw new Error(`Domain "${hostname} resolves to a private IP address.`);
             }
@@ -69,3 +69,5 @@ export const validateProxyTarget = async (url) => {
 
     
 };
+
+module.exports = { validateProxyTarget };
