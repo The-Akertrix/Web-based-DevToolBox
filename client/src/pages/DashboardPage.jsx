@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const TOOLS = [
   {
-    to: '/tools/json',
+    to: '/json',
     label: 'JSON Tools',
     description: 'Format, validate, minify & export JSON data instantly.',
     icon: (
@@ -17,7 +17,7 @@ const TOOLS = [
     badgeClass: 'badge-green',
   },
   {
-    to: '/tools/encoding',
+    to: '/encoding',
     label: 'Encoding Tools',
     description: 'Base64 encode/decode, hash generation (SHA-1/256/512), and UUID generation.',
     icon: (
@@ -31,7 +31,7 @@ const TOOLS = [
     badgeClass: 'badge-green',
   },
   {
-    to: '#',
+    to: '/regex',
     label: 'Regex Tester',
     description: 'Test and debug regular expressions with real-time match highlighting.',
     icon: (
@@ -41,25 +41,11 @@ const TOOLS = [
     ),
     gradient: 'from-[#f59e0b] to-[#ec4899]',
     glow: 'rgba(245,158,11,0.15)',
-    badge: 'Coming soon',
-    badgeClass: 'badge-brand',
+    badge: 'Ready',
+    badgeClass: 'badge-green',
   },
   {
-    to: '#',
-    label: 'Color Picker',
-    description: 'Pick, convert and explore colors in HEX, RGB, HSL, and more.',
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-      </svg>
-    ),
-    gradient: 'from-[#10b981] to-[#06b6d4]',
-    glow: 'rgba(16,185,129,0.15)',
-    badge: 'Coming soon',
-    badgeClass: 'badge-brand',
-  },
-  {
-    to: '#',
+    to: '/jwt',
     label: 'JWT Decoder',
     description: 'Decode and inspect JWT tokens — header, payload, and signature.',
     icon: (
@@ -69,8 +55,23 @@ const TOOLS = [
     ),
     gradient: 'from-[#06b6d4] to-[#10b981]',
     glow: 'rgba(6,182,212,0.15)',
-    badge: 'Coming soon',
-    badgeClass: 'badge-brand',
+    badge: 'Ready',
+    badgeClass: 'badge-green',
+  },
+
+    {
+    to: '/api-tester',
+    label: 'API Tester',
+    description: 'Send HTTP requests with a built-in proxy — like a mini Postman.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+    gradient: 'from-[#10b981] to-[#06b6d4]',
+    glow: 'rgba(16,185,129,0.15)',
+    badge: 'Ready',
+    badgeClass: 'badge-green',
   },
   {
     to: '#',
@@ -89,7 +90,7 @@ const TOOLS = [
 ];
 
 const STATS = [
-  { label: 'Tools Available', value: '2', suffix: '+' },
+  { label: 'Tools Available', value: '5', suffix: '+' },
   { label: 'Runs in Browser', value: '100', suffix: '%' },
   { label: 'Data Stored', value: '0', suffix: 'B' },
 ];
@@ -114,8 +115,9 @@ const DashboardPage = () => {
             Welcome to DevToolBox
           </h1>
           <p className="text-[#6e758f] text-lg max-w-xl leading-relaxed">
-            A collection of powerful developer utilities running entirely in your browser.
-            No uploads, no tracking — just tools.
+            A collection of powerful developer utilities. Most tools run entirely
+            in your browser — no uploads, no tracking. Some features use a secure
+            backend proxy.
           </p>
 
           <div className="flex items-center gap-6 mt-6">
@@ -190,7 +192,7 @@ const DashboardPage = () => {
       {/* ─── Footer note ─── */}
       <div className="text-center py-4">
         <p className="text-xs text-[#3d4263]">
-          All processing happens locally in your browser · No data is ever sent to a server
+          Most tools run entirely in your browser · API Tester &amp; JWT verification use a secure backend proxy
         </p>
       </div>
     </div>
