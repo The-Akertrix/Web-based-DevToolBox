@@ -14,7 +14,7 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const Layout = lazy(() => import('./components/layout/Layout'));
 
-// Tool pages — all 4 you currently have
+// Tool pages — 6 tools total
 const JsonToolsPage = lazy(() => import('./pages/tools/JsonToolPage'));
 const EncodingToolsPage = lazy(() => import('./pages/tools/EncodingToolsPage'));
 const RegexTesterPage = lazy(() => import('./pages/tools/RegexTesterPage'));
