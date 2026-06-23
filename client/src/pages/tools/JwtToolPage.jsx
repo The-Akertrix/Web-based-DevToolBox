@@ -61,7 +61,7 @@ const JwtToolPage = () => {
           />
           <div className="flex gap-2">
             <button onClick={handleDecode} className="btn-primary text-sm">Decode (Client-Side)</button>
-            <button onClick={() => setToken(SAMPLE_JWT)} className="btn-primary text-sm bg-gray-500 hover:bg-gray-600">Load Sample</button>
+            <button onClick={() => setToken(SAMPLE_JWT)} className="btn-secondary text-sm">Load Sample</button>
           </div>
           {decodeError && <p className="text-[#f87171] text-sm font-mono bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] p-3 rounded-lg">{decodeError}</p>}
         </div>
@@ -124,13 +124,13 @@ const JwtToolPage = () => {
           </button>
 
           {verifyResult && (
-            <div className={`p-4 rounded-lg border ${
+            <div className={`p-4 rounded-xl border ${
               verifyResult.valid
-                ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300'
-                : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
+                ? 'bg-[rgba(16,185,129,0.08)] border-[rgba(16,185,129,0.25)] text-[#34d399]'
+                : 'bg-[rgba(239,68,68,0.08)] border-[rgba(239,68,68,0.2)] text-[#f87171]'
             }`}>
               <p className="font-semibold">{verifyResult.valid ? '✓ Signature Valid' : '✗ Signature Invalid'}</p>
-              <p className="text-sm mt-1">{verifyResult.message}</p>
+              <p className="text-sm mt-1 opacity-80">{verifyResult.message}</p>
               {verifyResult.valid && verifyResult.decoded && (
                 <JSONDisplay data={verifyResult.decoded} />
               )}

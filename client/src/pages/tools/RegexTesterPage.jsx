@@ -10,6 +10,12 @@ const FLAG_OPTIONS = [
   { flag: 's', label: 's', title: 'Dotall — . matches newlines' },
 ];
 
+const toolIcon = (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+  </svg>
+);
+
 const RegexTesterPage = () => {
   const [pattern, setPattern] = useState('');
   const [flags, setFlags] = useState('g');
@@ -30,14 +36,10 @@ const RegexTesterPage = () => {
 
     let active = true;
     safeRegexTest(debouncedPattern, flags, debouncedTestString).then((res) => {
-      if (active) {
-        setResult(res);
-      }
+      if (active) setResult(res);
     });
 
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [debouncedPattern, flags, debouncedTestString]);
 
   const segments = useMemo(() => {
@@ -52,12 +54,17 @@ const RegexTesterPage = () => {
   };
 
   return (
-    <ToolLayout title="Regex Tester" description="Real-time regex matching with capture group inspection.">
+    <ToolLayout
+      title="Regex Tester"
+      description="Real-time regex matching with capture group inspection."
+      icon={toolIcon}
+    >
       <div className="grid grid-cols-1 gap-4">
-        {/* Pattern Input */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="font-mono text-gray-400 text-lg">/</span>
+
+        {/* ── Pattern Input ── */}
+        <div className="card space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[#545a7a] text-lg select-none">/</span>
             <input
               type="text"
               value={pattern}
@@ -66,43 +73,45 @@ const RegexTesterPage = () => {
               className="input-field font-mono flex-1"
               spellCheck={false}
             />
-            <span className="font-mono text-gray-400 text-lg">/{flags}</span>
+            <span className="font-mono text-[#545a7a] text-lg select-none">/{flags}</span>
           </div>
-          
+
           {/* Flag Toggles */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap items-center">
             {FLAG_OPTIONS.map(({ flag, label, title }) => (
               <button
                 key={flag}
                 title={title}
                 onClick={() => toggleFlag(flag)}
-                className={`px-3 py-1 rounded font-mono text-sm border transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-mono text-sm border transition-all duration-150 ${
                   flags.includes(flag)
-                    ? 'bg-brand-500 text-white border-brand-500'
-                    : 'bg-transparent text-gray-500 border-gray-300 dark:border-dark-border hover:border-brand-500'
+                    ? 'bg-[#7c3aed] text-white border-[#7c3aed] shadow-lg shadow-[#7c3aed]/25'
+                    : 'bg-transparent text-[#545a7a] border-[#2d3148] hover:border-[#7c3aed] hover:text-[#a06efd]'
                 }`}
               >
                 {label}
               </button>
             ))}
-            <span className="ml-auto text-sm text-gray-500">
+            <span className="ml-auto text-sm text-[#545a7a] tabular-nums">
               {matches.length} {matches.length === 1 ? 'match' : 'matches'}
             </span>
           </div>
         </div>
 
+        {/* ── Error Banner ── */}
         {error && (
-          <div className={`p-3 rounded-lg text-sm font-mono ${
-            isTimeout ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400 border border-orange-200'
-                      : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-200'
+          <div className={`p-3 rounded-lg text-sm font-mono border ${
+            isTimeout
+              ? 'bg-[rgba(245,158,11,0.08)] text-[#fbbf24] border-[rgba(245,158,11,0.3)]'
+              : 'bg-[rgba(239,68,68,0.08)] text-[#f87171] border-[rgba(239,68,68,0.2)]'
           }`}>
             {error}
           </div>
         )}
 
-        {/* Test String with Highlighting */}
+        {/* ── Test String with Highlighting ── */}
         <div className="card space-y-3">
-          <label className="font-semibold text-sm">Test String</label>
+          <label className="font-semibold text-sm text-[#d8dbe8]">Test String</label>
           <div className="relative">
             {/* Transparent textarea on top for typing */}
             <textarea
@@ -112,16 +121,19 @@ const RegexTesterPage = () => {
               placeholder="Enter test string here..."
               spellCheck={false}
             />
-            {/* Highlighted overlay (rendered beneath but visually on top via CSS) */}
+            {/* Highlighted overlay rendered beneath */}
             {segments && (
-              <div className="absolute inset-0 font-mono text-sm p-[9px] pointer-events-none whitespace-pre-wrap break-all overflow-hidden rounded-lg z-0">
+              <div className="absolute inset-0 font-mono text-sm p-[10px] pointer-events-none whitespace-pre-wrap break-all overflow-hidden rounded-lg z-0">
                 {segments.map((seg, i) =>
                   seg.isMatch ? (
-                    <mark key={i} className="bg-yellow-200 dark:bg-yellow-800 rounded">
+                    <mark
+                      key={i}
+                      style={{ background: 'rgba(124,58,237,0.35)', color: 'transparent', borderRadius: '3px' }}
+                    >
                       {seg.text}
                     </mark>
                   ) : (
-                    <span key={i} className="text-transparent">{seg.text}</span>
+                    <span key={i} style={{ color: 'transparent' }}>{seg.text}</span>
                   )
                 )}
               </div>
@@ -129,18 +141,21 @@ const RegexTesterPage = () => {
           </div>
         </div>
 
-        {/* Match Details */}
+        {/* ── Match Details ── */}
         {matches.length > 0 && (
-          <div className="card">
-            <label className="font-semibold text-sm mb-3 block">Match Details</label>
-            <div className="space-y-2 max-h-60 overflow-auto">
+          <div className="card space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="font-semibold text-sm text-[#d8dbe8]">Match Details</label>
+              <span className="badge badge-cyan text-[11px]">{matches.length} found</span>
+            </div>
+            <div className="space-y-1.5 max-h-60 overflow-auto">
               {matches.map((match, i) => (
-                <div key={i} className="flex gap-4 text-sm font-mono bg-gray-50 dark:bg-dark-bg p-2 rounded">
-                  <span className="text-gray-400">#{i + 1}</span>
-                  <span className="text-green-600 dark:text-green-400">"{match.value}"</span>
-                  <span className="text-gray-500">index: {match.index}–{match.end}</span>
+                <div key={i} className="flex gap-4 text-sm font-mono bg-[#080a0f] border border-[#1c1f2e] p-2.5 rounded-lg">
+                  <span className="text-[#3d4263] min-w-[2rem]">#{i + 1}</span>
+                  <span className="text-[#34d399]">"{match.value}"</span>
+                  <span className="text-[#545a7a]">index: {match.index}–{match.end}</span>
                   {match.groups.length > 0 && (
-                    <span className="text-purple-600 dark:text-purple-400">
+                    <span className="text-[#a06efd]">
                       groups: [{match.groups.map(g => `"${g}"`).join(', ')}]
                     </span>
                   )}
