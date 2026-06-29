@@ -33,7 +33,8 @@ const startServer = async () => {
     //Graceful shutdown
     process.on('SIGTERM', () => {
         console.log('SIGTERM received. Shutting down gracefully....');
-        server.close(() => {
+        httpServer.close(() => {
+            const mongoose = require('mongoose');
             mongoose.connection.close(false, () => {
                 console.log('MongoDB connection closed.');
                 process.exit(0);

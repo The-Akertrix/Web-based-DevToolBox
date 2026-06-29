@@ -36,12 +36,14 @@ const CodeRoomPage = () => {
   const [roomId, setRoomId] = useState('');
   const [inputRoomId, setInputRoomId] = useState('');
   const [language, setLanguage] = useState('javascript');
-  const [connectionStatus, setConnectionStatus] = useState('connecting');
+  const socket = useSocket();
+  const [connectionStatus, setConnectionStatus] = useState(
+    socket?.connected ? 'connected' : 'connecting'
+  );
   const [socketError, setSocketError] = useState(null);
 
   const currentUser = useSelector(selectCurrentUser);
   const { isDark } = useTheme();
-  const socket = useSocket();
 
   const {
     // Bug 5 fix: renamed from `document` to `docContent` to avoid shadowing the
@@ -56,6 +58,10 @@ const CodeRoomPage = () => {
   // Bug 2 fix: named handlers so they can be properly removed in cleanup
   useEffect(() => {
     if (!socket) return;
+
+    if (socket.connected) {
+      setConnectionStatus('connected');
+    }
 
     const onConnect = () => {
       setConnectionStatus('connected');
